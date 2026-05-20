@@ -4,20 +4,24 @@ session_start();
 
 require 'config.php';
 
+/* Prevent cache */
+header("Cache-Control: no-cache, no-store, must-revalidate");
+header("Pragma: no-cache");
+header("Expires: 0");
+
 if(isset($_SESSION['admin'])){
 
     header("Location: dashboard.php");
     exit;
 }
 
-
 $error = "";
 
 if($_SERVER['REQUEST_METHOD'] == "POST"){
 
-    $username = $_POST['username'];
+    $username = trim($_POST['username']);
 
-    $password = $_POST['password'];
+    $password = trim($_POST['password']);
 
     $stmt = $pdo->prepare(
         "SELECT * FROM admins WHERE username=?"
@@ -25,20 +29,21 @@ if($_SERVER['REQUEST_METHOD'] == "POST"){
 
     $stmt->execute([$username]);
 
-    $admin = $stmt->fetch();
+    $admin = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if($admin && password_verify($password,$admin['password'])){
 
-    $_SESSION['admin'] = $admin['username'];
+        /* NEW SECURE SESSION ID */
+        session_regenerate_id(true);
 
-    /* ROLE SESSION */
+        $_SESSION['admin'] = $admin['username'];
 
-    $_SESSION['role'] = $admin['role'];
+        $_SESSION['role'] = $admin['role'];
 
-    header("Location: dashboard.php");
-    exit;
+        header("Location: dashboard.php");
+        exit;
 
-}else{
+    }else{
 
         $error = "Invalid Username or Password";
     }

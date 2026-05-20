@@ -240,6 +240,10 @@
 
 </section>
 
+<!-- MANAGER SECTION -->
+
+
+
 <!-- ACHIEVEMENTS -->
 
 <section class="achievement-section">
